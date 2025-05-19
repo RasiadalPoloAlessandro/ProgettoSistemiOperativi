@@ -23,10 +23,10 @@ int convert_Address(int address);
 int main(int argc, char *argv)
 {
 
-    int pages = argv[1];
+    int pages = argv[0];
     page_frame *frames = malloc(pages * sizeof(page_frame));
 
-    printf("%i\n", sizeof(frames));
+    printf("%li\n", sizeof(frames));
 
     return 0;
 }
