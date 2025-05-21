@@ -11,7 +11,6 @@ int read_file(FILE *fp)
     {
         printf("%s", line);
     }
-    free(line);
-
+    
     return 0;
 }
