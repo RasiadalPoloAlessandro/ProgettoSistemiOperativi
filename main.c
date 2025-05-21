@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "files/headers/utility.h"
-#define PAGE_DIM 4096
 
 int page_fault = 0, page_hit = 0;
 
@@ -19,7 +18,6 @@ struct page_frame
  * POST: converto indirizzo di input alla pagina virtuale corrispondente
  */
 
-int convert_AddressToPage(int address);
 
 int main(int argc, char **argv)
 {
@@ -39,9 +37,4 @@ int main(int argc, char **argv)
         read_file(fp);
 
     return 0;
-}
-
-int convert_AddressToPage(int address)
-{
-    return address / PAGE_DIM;
 }
