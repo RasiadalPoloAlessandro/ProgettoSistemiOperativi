@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "headers/utility.h"
+#define PAGE_DIM 4096
 
 int read_file(FILE *fp)
 {
@@ -13,4 +14,9 @@ int read_file(FILE *fp)
     }
     
     return 0;
+}
+
+int convert_AddressToPage(int address)
+{
+    return address / PAGE_DIM;
 }
