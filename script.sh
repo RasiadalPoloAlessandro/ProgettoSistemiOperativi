@@ -9,4 +9,4 @@ fi
 gcc ./main.c ./files/utility.c
 chmod +x a.out
 
-./a.out 4
+./a.out 4 ./inputs/

@@ -22,19 +22,11 @@ struct page_frame
 int main(int argc, char **argv)
 {
 
-    int pages = atoi(argv[0]); //atoi serve per convertire in int
+    int pages = atoi(argv[1]); //atoi serve per convertire in int
     page_frame *frames = malloc(pages * sizeof(page_frame));
 
     printf("%li\n", sizeof(frames));
-
-    FILE *fp = fopen("inputs/processo1.txt", "r");
-    if (!fp)
-    {
-        perror("Errore nell'apertura del file");
-        return 1;
-    }
-    else
-        read_file(fp);
+    read_directory(argv[2]);
 
     return 0;
 }

@@ -1,0 +1,139 @@
+﻿Progetto Sistemi Operativi: Simulatore di Algoritmi di Paging
+
+1. Descrizione Generale del Progetto
+L'obiettivo di questo progetto è sviluppare un simulatore di diversi algoritmi di rimpiazzo delle pagine.
+Il progetto prevede l'utilizzo di linguaggio C per la logica di simulazione e di scripting Bash per l'orchestrazione, la compilazione e l'analisi dei risultati.
+
+Struttura del Progetto:
+* Programma C:
+   * Implementa la struttura della memoria fisica (suddivisa in frame di pagina).
+   * Legge file di traccia dove ogni riga contiene un indirizzo virtuale (espresso in byte).
+   * Calcola il numero di pagina virtuale a partire dall'indirizzo virtuale, assumendo una dimensione di pagina di 4KB (4096 byte).   
+   * Gestisce le richieste di accesso alle pagine virtuali (derivate dagli indirizzi) in ordine sequenziale come appaiono nel file di traccia.
+   * Implementa almeno due algoritmi di rimpiazzo delle pagine (e.g., FIFO, LRU, Clock, Ottimale, …). Si consideri una politica di rimpiazzo globale (i page frame sono condivisi tra tutti i processi).
+   * Colleziona statistiche come il numero di page fault e page hit.
+   * Se vengono implementati algoritmi che utilizzano i bit R (Referenced) e M (Modified) e richiedono un loro reset periodico (e.g., Second Chance), il programma dovrà accettare un parametro per l'intervallo di reset (espresso in numero di riferimenti processati o "tick" logici).
+   * Gestione dei Riferimenti:
+      * Accetta dalla linea di comando un elenco di uno o più percorsi a file di traccia.
+      * Definisce una macro QUANTUM all'interno del codice C. Questo QUANTUM specifica il numero massimo di righe (riferimenti di indirizzo) da processare da ciascun file di traccia prima di passare al file successivo in modalità round-robin.
+      * Il programma apre tutti i file di traccia. In un ciclo principale, itera sui file: per file1 processa fino a QUANTUM righe, poi per file2 fino a QUANTUM righe, e così via, tornando ciclicamente al primo file. Questo ciclo continua finché tutti i riferimenti da tutti i file non sono stati processati.
+      * Lo stato della memoria fisica (contenuto dei frame) e il contatore di tempo logico persistono attraverso la processazione di questi "quanta" e attraverso i diversi file.
+      * Le statistiche vengono aggregate su tutti i riferimenti processati da tutti i file in quella esecuzione.
+
+* Script Bash:
+   * Funge da orchestratore per l'intero processo.
+   * Verifica la presenza del codice sorgente C e lo compila per generare l'eseguibile, gestendo eventuali errori.
+   * Input: Dimensione della RAM (espressa in numero di page frame disponibili), il percorso a una cartella contenente i file di traccia dei processi (ognuno con indirizzi virtuali), e l'eventuale parametro per l'intervallo di reset dei bit R/M per algoritmi specifici.
+   * Esecuzione:
+      * Lancia l'eseguibile C compilato, fornendogli i parametri necessari (numero di frame, lista dei file traccia, l'algoritmo da usare, ed eventuale intervallo di reset). Esegue il programma C due volte, una per ciascun algoritmo di rimpiazzo.
+   * Post-elaborazione:
+      * Controlla che il programma C sia terminato correttamente per ogni esecuzione.
+      * Cattura l'output (possibili metodi: Il programma C stampa su file; il programma bash cattura lo stdout del programma C) del programma C (che conterrà le statistiche per quel file di traccia e quell'algoritmo).
+      * Stampa sullo standard output i risultati.
+   * Rimuove eventuali file temporanei creati durante l'esecuzione.
+
+2. Modalità di Svolgimento, Consegna e Valutazione
+   * Il progetto può essere svolto individualmente o da un gruppo di massimo due studenti (indipendentemente se matricola pari o dispari).
+   * Consegna:
+      * Al più uno studente per gruppo dovrà inviare il progetto tramite la piattaforma Moodle.
+      * La consegna consisterà in un singolo file compresso (e.g., formato .tar.gz o .zip).
+      * Il file compresso dovrà contenere una cartella principale con il seguente nome: <matricola_studente_uno>[_<matricola_studente_due>] (es. 123456 per uno studente singolo, o 123456_789012 per un gruppo di due).
+      * All'interno di questa cartella, si dovranno trovare:
+         1. I/Il file sorgente .c necessari per compilare il progetto
+         2. Lo script Bash.
+         3. Un file di testo (.txt) con lo stesso nome della cartella (es. 123456.txt o 123456_789012.txt). Questo file dovrà contenere:
+             * Nome, Cognome e Numero di Matricola di ogni partecipante del gruppo (massimo due).
+             * Una breve descrizione del funzionamento del codice C sviluppato, evidenziando le scelte progettuali principali.
+             * Una breve descrizione del funzionamento dello script Bash, spiegando come orchestra la simulazione e l'analisi.
+
+
+* Scadenze:
+   * Per poter registrare il voto del progetto unitamente al risultato del compitino o all'appello del 30 giugno, la consegna dovrà avvenire entro il 15 giugno.
+   * Per una qualunque altra data di appello d'esame, la deadline per la consegna del progetto è fissata a una settimana prima della data dell'esame scritto.
+* Validità del Voto: Il voto conseguito per il progetto è valido esclusivamente per l'anno accademico corrente.
+* Composizione del Voto Finale: Il voto del progetto si aggiunge al voto conseguito all'esame scritto (o alla media dei voti dei due compitini), a condizione che tale voto d'esame sia almeno 18/30.
+
+3. Grade Rubric del Progetto
+* Progetto Base (fino a 1.5/3 punti):
+   * Implementazione del programma C (in modalità single-thread) che:
+      * Converte correttamente gli indirizzi virtuali in numeri di pagina.
+      * Simula almeno due algoritmi di rimpiazzo delle pagine.
+   * Sviluppo dello script Bash che:
+      * Gestisce la compilazione del codice C.
+      * Esegue il simulatore C per ciascun algoritmo.
+      * Aggrega e genera le statistiche comparative (almeno numero di page fault e page hit totali).
+* Estensione (cumulativa per raggiungere il punteggio massimo):
+   * Versione Multi-Threaded (incremento di +1.5 punto sul punteggio base):
+      * Il programma C dovrà adottare un approccio multi-threaded. Ogni file di traccia (.txt) rappresenterà un "flusso di accessi" di un processo distinto, e ogni flusso verrà processato da un thread dedicato all'interno del programma C.
+      * Dato che non ci sono timestamp espliciti, i thread processeranno i loro indirizzi in modo indipendente e sequenziale. La "competizione" per i frame di memoria avviene accedendo alla tabella dei frame condivisa.
+      * Questa estensione richiede una gestione attenta della sincronizzazione (e.g., mutex) per garantire l'accesso sicuro e consistente alla tabella dei frame di pagina condivisa e alle statistiche globali. 
+
+4. Logica di Funzionamento
+Logica dello Script Bash (per versione base, single-thread)
+1. Compilazione del Codice C:
+   * Lo script verifica se l'eseguibile C è presente.
+   * Tenta di compilare il file sorgente C.
+   * Gestisce eventuali errori di compilazione, interrompendo lo script in caso di fallimento.
+2. Lo script controlla la validità e la presenza degli argomenti passati dall'utente.
+3. Vengono inizializzate variabili per accumulare i risultati (e.g., total_faults_algo1=0, total_hits_algo1=0, etc.).
+4. Trova tutti i file .txt nella cartella dei processi e memorizza i loro percorsi.
+5. Esecuzione del Programma C (una volta per algoritmo):
+* Per ogni algoritmo da testare invoca l'eseguibile C, passando come argomenti: <num_frame>, nome dell'algoritmo, [reset_interval] (opzionale), e poi l'elenco completo dei percorsi ai file di traccia (<file1.txt> <file2.txt> ...).
+6. Dopo aver processato tutti i file di traccia, stampa a schermo un sommario formattato che confronta le prestazioni aggregate dei diversi algoritmi su tutti i file.
+7. Pulizia: Rimuove eventuali file temporanei
+
+Logica del Programma C (Cenni sull'Estensione Multi-Threaded)
+* Il thread main scansiona gli argomenti, e per ogni file di traccia lancia un thread worker.
+* Ogni worker legge il proprio file di traccia, converte indirizzi in page_id sequenzialmente.
+* L'accesso alla "RAM" condivisa e alle statistiche globali deve essere protetto da mutex.
+* Un global_logical_time_counter (protetto da mutex e incrementato ad ogni accesso MMU da qualsiasi thread) può essere usato per il tie-breaking.
+* Il thread main attende la terminazione di tutti i worker e poi stampa le statistiche globali.
+
+5. Esempio Pratico
+A. File di Input dei Processi:
+Creare una cartella, ad esempio tracce_indirizzi/. All'interno:
+* tracce_indirizzi/processo1.txt:
+0
+4096
+8192
+0
+12288
+4096
+
+(Corrisponde alle pagine: 0, 1, 2, 0, 3, 1)
+* tracce_indirizzi/processo2.txt:
+20000
+24000
+20000
+28000
+
+(Corrisponde alle pagine: 4, 5, 4, 6)
+
+
+C. Output Atteso dallo Script Bash (Esempio Concettuale):
+Compilazione di paging_simulator.c...
+Compilazione riuscita.
+---
+Fifo in esecuzione...
+LRU in esecuzione...
+
+
+RISULTATI DELLA SIMULAZIONE:
+Frame disponibili: 3
+
+
+FIFO dell'algoritmo:
+Page fault totali: X_fifo
+Page hit totali: Y_fifo
+Fault rate complessivo: Z_fifo
+
+
+LRU dell'algoritmo:
+Page fault totali: X_lru
+Page hit totali: Y_lru
+Fault rate complessivo: Z_lru
+---
+Pulizia dei file temporanei...
+Script terminato.
+
+(Dove X, Y, Z sono i valori aggregati calcolati dallo script Bash dopo aver sommato i fault/hit da ogni esecuzione del C).
