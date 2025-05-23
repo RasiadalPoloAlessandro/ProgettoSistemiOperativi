@@ -3,6 +3,13 @@
 #include "headers/utility.h"
 #define PAGE_DIM 4096
 
+typedef struct nodoStringa Lista;
+struct nodoStringa{
+
+    char* value;
+    struct nodoStringa *next_ptr;
+
+};
 
 FILE* open_file(char* file){
 
@@ -53,4 +60,16 @@ char* read_directory(char *directory)
         }
         else
             perror("Errore nella lettura della cartella");
+}
+
+void pre_insert(Lista **ptr, int val)
+{
+
+    Lista *tmpPtr = *ptr;
+
+    *ptr = malloc(sizeof(Lista));
+    (*ptr)->value = val;
+    (*ptr)->next_ptr = tmpPtr;
+
+    printf("%i\n", (*ptr)->value);
 }
