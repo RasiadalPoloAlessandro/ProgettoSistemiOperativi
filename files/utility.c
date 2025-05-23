@@ -1,17 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "headers/utility.h"
+#include <string.h>
 #define PAGE_DIM 4096
+int fileCounter = 0;
 
-typedef struct nodoStringa Lista;
-struct nodoStringa{
+struct nodoStringa
+{
 
-    char* value;
+    char *value;
     struct nodoStringa *next_ptr;
-
 };
 
-FILE* open_file(char* file){
+FILE *open_file(char *file)
+{
 
     FILE *fp = fopen(file, "r");
     if (!fp)
@@ -39,37 +41,48 @@ int convert_AddressToPage(int address)
     return address / PAGE_DIM;
 }
 
-
 /*
-* Leggo la cartella contentente i file di input
-*/
-char* read_directory(char *directory)
+ * Leggo la cartella contentente i file di input
+ */
+
+void pre_insert(Lista **ptr, char* val)
 {
-    DIR *d;
-    char* files;
-    struct dirent *dir;
-        char *path = directory;
-        d = opendir(path);
-        if (d)
-        {
-            while ((dir = readdir(d)) != NULL)
-            {
-                printf("%s\n", dir->d_name);
-            }
-            closedir(d);
-        }
-        else
-            perror("Errore nella lettura della cartella");
+    Lista *tmpPtr = *ptr;
+    *ptr = malloc(sizeof(Lista));
+    if (*ptr == NULL) {
+        perror("Malloc fallita");
+        exit(1);
+    }
+    (*ptr)->value = strdup(val);  // copia la stringa
+    (*ptr)->next_ptr = tmpPtr;
 }
 
-void pre_insert(Lista **ptr, int val)
+Lista* read_directory(char *directory)
 {
+    DIR *d;
+    Lista *percorsi = NULL;
+    struct dirent *dir;
 
-    Lista *tmpPtr = *ptr;
+    d = opendir(directory);
+    if (d)
+    {
+        while ((dir = readdir(d)) != NULL)
+        {
+            if (++fileCounter > 2)
+                pre_insert(&percorsi, dir->d_name);
+        }
+        closedir(d);
 
-    *ptr = malloc(sizeof(Lista));
-    (*ptr)->value = val;
-    (*ptr)->next_ptr = tmpPtr;
+        Lista *ptr = percorsi;
+        while (ptr != NULL)
+        {
+            printf("Valore memorizzato: %s\n", ptr->value);
+            ptr = ptr->next_ptr;
+        }
+    }
+    else {
+        perror("Errore nella lettura della cartella");
+    }
 
-    printf("%i\n", (*ptr)->value);
+    return percorsi;
 }
