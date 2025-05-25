@@ -9,7 +9,8 @@ struct page_frame
     int mBit;
 };
 typedef struct page_frame page_frame;
-int read_file(FILE *fp);
+void process_file(char* path, page_frame *frames, int *bufferIndex, int numElements);
+//int read_file(FILE *fp);
 int convert_AddressToPage(int address);
 FILE* open_file(char* file);
 struct nodoStringa

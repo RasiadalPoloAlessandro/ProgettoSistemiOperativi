@@ -15,6 +15,19 @@ int main(int argc, char **argv)
     
     //Creo una lista che memorizza i percorsi dei file di input
     Lista* processes = read_directory(argv[2]);
+    int m = 0;
+
+    for (int i = 0; i < pages; i++) {
+        frames[i].pageId = -1;
+        frames[i].rBit = 0;
+        frames[i].mBit = 0;
+    }
+
+    while(processes->next_ptr != NULL){
+
+        process_file(processes->value, frames, &m, pages);
+        processes = processes->next_ptr;
+    }
 
     return 0;
 }

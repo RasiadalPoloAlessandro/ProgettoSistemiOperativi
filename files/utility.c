@@ -3,7 +3,7 @@
 #include "headers/utility.h"
 #include <string.h>
 #define PAGE_DIM 4096
-#define PATH "./files/inputs/"
+#define PATH "inputs/"
 int fileCounter = 0;
 
 // Implementa la struttura della memoria fisica (suddivisa in frame di pagina)
@@ -32,6 +32,29 @@ int read_file(FILE *fp)
 
     return 0;
 }
+
+void process_file(char* path, page_frame *frames, int *bufferIndex, int numElements)
+{
+    //printf("File da aprire: %s\n", path);
+    FILE *fp = open_file(path);
+    if (fp == NULL){
+        perror("Errore durante l'elaborazione");
+        return;
+    } 
+
+    char *line = NULL;
+    size_t len = 0;
+
+    while (getline(&line, &len, fp) != -1)
+    {
+        int address = atoi(line);
+        secondChance(address, frames, bufferIndex, numElements);
+    }
+
+    free(line);
+    fclose(fp);
+}
+
 
 int convert_AddressToPage(int address)
 {
@@ -78,7 +101,7 @@ Lista *read_directory(char *directory)
         Lista *ptr = percorsi;
         while (ptr != NULL)
         {
-            printf("Valore memorizzato: %s\n", ptr->value);
+            //printf("Valore memorizzato: %s\n", ptr->value);
             ptr = ptr->next_ptr;
         }
     }
@@ -105,6 +128,7 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
         if (frames[i].pageId == pageID)
         {
             frames[i].rBit = 1;
+            printf("Page Hit\n");
             return 0;
         }
     }
@@ -117,9 +141,12 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
             frames[i].pageId = pageID;
             frames[i].rBit = 1;
             frames[i].mBit = 0;
+            printf("Page Fault per spazio libero\n");
             return 1; // Page fault, ma nessuna sostituzione
         }
     }
+
+    printf("Page Fault, non presente in RAM\n");
 
     while (1)
     {
