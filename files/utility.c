@@ -35,6 +35,7 @@ int read_file(FILE *fp)
 
 void process_file(char* path, page_frame *frames, int *bufferIndex, int numElements)
 {
+    printf("Processando file: %s\n", path);
     //printf("File da aprire: %s\n", path);
     FILE *fp = open_file(path);
     if (fp == NULL){

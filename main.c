@@ -23,7 +23,7 @@ int main(int argc, char **argv)
         frames[i].mBit = 0;
     }
 
-    while(processes->next_ptr != NULL){
+    while(processes != NULL){
 
         process_file(processes->value, frames, &m, pages);
         processes = processes->next_ptr;
