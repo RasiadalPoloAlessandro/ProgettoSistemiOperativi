@@ -3,6 +3,7 @@
 #include "headers/utility.h"
 #include <string.h>
 #define PAGE_DIM 4096
+#define PATH "./files/inputs/"
 int fileCounter = 0;
 
 struct nodoStringa
@@ -45,19 +46,20 @@ int convert_AddressToPage(int address)
  * Leggo la cartella contentente i file di input
  */
 
-void pre_insert(Lista **ptr, char* val)
+void pre_insert(Lista **ptr, char *val)
 {
     Lista *tmpPtr = *ptr;
     *ptr = malloc(sizeof(Lista));
-    if (*ptr == NULL) {
+    if (*ptr == NULL)
+    {
         perror("Malloc fallita");
         exit(1);
     }
-    (*ptr)->value = strdup(val);  // copia la stringa
+    (*ptr)->value = strdup(val); // copia la stringa
     (*ptr)->next_ptr = tmpPtr;
 }
 
-Lista* read_directory(char *directory)
+Lista *read_directory(char *directory)
 {
     DIR *d;
     Lista *percorsi = NULL;
@@ -69,7 +71,11 @@ Lista* read_directory(char *directory)
         while ((dir = readdir(d)) != NULL)
         {
             if (++fileCounter > 2)
-                pre_insert(&percorsi, dir->d_name);
+            {
+                char fullPath[512];
+                snprintf(fullPath, sizeof(fullPath), "%s%s", PATH, dir->d_name);
+                pre_insert(&percorsi, fullPath);
+            }
         }
         closedir(d);
 
@@ -80,7 +86,8 @@ Lista* read_directory(char *directory)
             ptr = ptr->next_ptr;
         }
     }
-    else {
+    else
+    {
         perror("Errore nella lettura della cartella");
     }
 
