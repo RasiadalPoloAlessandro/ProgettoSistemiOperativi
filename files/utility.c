@@ -92,7 +92,7 @@ Lista *read_directory(char *directory)
 
 /*
  * PRE: Stream di lettura su un file non nullo, memoria che implementa i bit necessari per applicare l'algoritmo
- * POST:
+ * POST: Ritorna 1 se c'è stato un PageFault, 0 se invece pageHit
  */
 int secondChance(int address, page_frame *frames, int *bufferIndex, int numElements)
 {
