@@ -120,21 +120,20 @@ Lista *read_directory(char *directory)
  */
 int secondChance(int address, page_frame *frames, int *bufferIndex, int numElements)
 {
-
     int pageID = convert_AddressToPage(address);
-
+    
     // Controllo se c'è la pagina in RAM (pageHit)
     for (int i = 0; i < numElements; i++)
     {
         if (frames[i].pageId == pageID)
         {
-            frames[i].rBit = 1;
+            frames[i].rBit = 1;  // Setta il reference bit
             printf("Page Hit\n");
             return 0;
         }
     }
-
-    //Dato che la RAM parte vuota potrei avere ancora spazi liberi
+    
+    // Dato che la RAM parte vuota potrei avere ancora spazi liberi
     for (int i = 0; i < numElements; i++)
     {
         if (frames[i].pageId == -1)
@@ -146,24 +145,31 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
             return 1; // Page fault, ma nessuna sostituzione
         }
     }
-
+    
     printf("Page Fault, non presente in RAM\n");
-
+    
+    // Implementazione corretta dell'algoritmo Second Chance
     while (1)
     {
         if (frames[*bufferIndex].rBit == 0)
         {
+            // Pagina trovata per la sostituzione
+            int oldPageID = frames[*bufferIndex].pageId;
+            
             // Sostituisco la pagina
             frames[*bufferIndex].pageId = pageID;
             frames[*bufferIndex].rBit = 1;
             frames[*bufferIndex].mBit = 0;
+            
+            printf("Sostituisco pagina %i con pagina %i\n", oldPageID, pageID);
+            
+            // Aggiorna il puntatore per la prossima volta
             *bufferIndex = (*bufferIndex + 1) % numElements;
-            printf("Sostituisco pagina %i con pagina %i\n", frames[*bufferIndex].pageId, pageID);
             return 1;
         }
         else
         {
-            // Eseguo lo "shift" dell'indice del buffer Circolare
+            // Dai una seconda possibilità: resetta R-bit e vai avanti
             frames[*bufferIndex].rBit = 0;
             *bufferIndex = (*bufferIndex + 1) % numElements;
         }
