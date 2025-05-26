@@ -33,7 +33,7 @@ int read_file(FILE *fp)
     return 0;
 }
 
-void process_file(char* path, page_frame *frames, int *bufferIndex, int numElements)
+void process_file(char* path, page_frame *frames, int *bufferIndex, int numElements, int algorithm)
 {
     printf("Processando file: %s\n", path);
     //printf("File da aprire: %s\n", path);
@@ -49,7 +49,12 @@ void process_file(char* path, page_frame *frames, int *bufferIndex, int numEleme
     while (getline(&line, &len, fp) != -1)
     {
         int address = atoi(line);
-        secondChance(address, frames, bufferIndex, numElements);
+        if(algorithm){
+            secondChance(address, frames, bufferIndex, numElements);
+        }
+        else
+            fiFo(address, frames, bufferIndex, numElements);
+
     }
 
     free(line);
@@ -173,5 +178,52 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
             frames[*bufferIndex].rBit = 0;
             *bufferIndex = (*bufferIndex + 1) % numElements;
         }
+    }
+}
+
+int fiFo(int address, page_frame *frames, int *bufferIndex, int numElements)
+{
+    int pageID = convert_AddressToPage(address);
+    
+    // Controllo se c'è la pagina in RAM (pageHit)
+    for (int i = 0; i < numElements; i++)
+    {
+        if (frames[i].pageId == pageID)
+        {
+            printf("Page Hit\n");
+            return 0;
+        }
+    }
+    
+    // Dato che la RAM parte vuota potrei avere ancora spazi liberi
+    for (int i = 0; i < numElements; i++)
+    {
+        if (frames[i].pageId == -1)
+        {
+            frames[i].pageId = pageID;
+            printf("Page Fault per spazio libero\n");
+            return 1; // Page fault, ma nessuna sostituzione
+        }
+    }
+    
+    printf("Page Fault, non presente in RAM\n");
+    
+    // Implementazione corretta dell'algoritmo Second Chance
+    while (1)
+    {
+
+            // Pagina trovata per la sostituzione
+            int oldPageID = frames[*bufferIndex].pageId;
+            
+            // Sostituisco la pagina
+            frames[*bufferIndex].pageId = pageID;
+            
+            printf("Sostituisco pagina %i con pagina %i\n", oldPageID, pageID);
+            
+            // Aggiorna il puntatore per la prossima volta
+            *bufferIndex = (*bufferIndex + 1) % numElements;
+            return 1;
+        
+
     }
 }

@@ -16,6 +16,7 @@ int main(int argc, char **argv)
     //Creo una lista che memorizza i percorsi dei file di input
     Lista* processes = read_directory(argv[2]);
     int m = 0;
+    int algorithm =atoi(read_directory(argv[3]));
 
     for (int i = 0; i < pages; i++) {
         frames[i].pageId = -1;
@@ -25,7 +26,7 @@ int main(int argc, char **argv)
 
     while(processes != NULL){
 
-        process_file(processes->value, frames, &m, pages);
+        process_file(processes->value, frames, &m, pages, algorithm);
         processes = processes->next_ptr;
     }
 
