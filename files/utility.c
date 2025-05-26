@@ -158,6 +158,7 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
             frames[*bufferIndex].rBit = 1;
             frames[*bufferIndex].mBit = 0;
             *bufferIndex = (*bufferIndex + 1) % numElements;
+            printf("Sostituisco pagina %i con pagina %i\n", frames[*bufferIndex].pageId, pageID);
             return 1;
         }
         else
