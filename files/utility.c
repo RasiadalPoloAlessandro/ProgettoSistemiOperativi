@@ -7,6 +7,7 @@
 int fileCounter = 0;
 
 
+
 FILE *open_file(char *file)
 {
 
@@ -33,7 +34,7 @@ int read_file(FILE *fp)
     return 0;
 }
 
-void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm)
+void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, int* pgHt, int* pgMs)
 {
     printf("Processando file: %s\n\n", path);
     // printf("File da aprire: %s\n", path);
@@ -54,10 +55,10 @@ void process_file(char *path, page_frame *frames, int *bufferIndex, int numEleme
         int address = atoi(line);
         if (algorithm == 1)
         {
-            secondChance(address, frames, bufferIndex, numElements);
+            secondChance(address, frames, bufferIndex, numElements, pgHt, pgMs);
         }
         else
-            LRU(address, frames, bufferIndex, numElements);
+            LRU(address, frames, bufferIndex, numElements, pgHt, pgMs);
     }
 
     free(line);
@@ -130,7 +131,7 @@ Lista *read_directory(char *directory)
 * numElements è il numero di pagine
 * POST: Ritorna 1 se c'è stato un fageFault per sistituzione pagina o spazio libero, 0 se c'è stato un pageHit
 */
-int secondChance(int address, page_frame *frames, int *bufferIndex, int numElements)
+int secondChance(int address, page_frame *frames, int *bufferIndex, int numElements, int* pgHt, int* pgMs)
 {
     int pageID = convert_AddressToPage(address);
 
@@ -140,6 +141,7 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
         if (frames[i].pageId == pageID)
         {
             frames[i].rBit = 1; // Setta il reference bit
+            *pgHt ++;
             printf("Page Hit\n");
             return 0;
         }
@@ -153,11 +155,12 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
             frames[i].pageId = pageID;
             frames[i].rBit = 1;
             frames[i].mBit = 0;
+            *pgMs ++;
             printf("Page Fault per spazio libero\n");
             return 1; // Page fault, ma nessuna sostituzione
         }
     }
-
+    *pgMs ++;
     printf("Page Fault, non presente in RAM\n");
 
     //Scorro finché non trovo la pagina da sostituire, Solo se devo sostuire l'indice del buffer va avanti
@@ -192,7 +195,7 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
 * numElements è il numero di pagine
 * POST: Ritorna 1 se c'è stato un fageFault per sistituzione pagina o spazio libero, 0 se c'è stato un pageHit
 */
-int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
+int LRU(int address, page_frame *frames, int *bufferIndex, int numElements, int* pgHt, int* pgMs)
 {
     int pageID = convert_AddressToPage(address);
 
@@ -201,6 +204,7 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
     {
         if (frames[i].pageId == pageID)
         {
+            *pgHt ++;
             printf("Page Hit\n");
             return 0;
         }
@@ -212,11 +216,12 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
         if (frames[i].pageId == -1)
         {
             frames[i].pageId = pageID;
+            *pgMs ++;
             printf("Page Fault per spazio libero\n");
             return 1; // Page fault, ma nessuna sostituzione
         }
     }
-
+    *pgMs ++;
     printf("Page Fault, non presente in RAM\n");
 
     //Eseguo la politica

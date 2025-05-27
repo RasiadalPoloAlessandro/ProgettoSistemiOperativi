@@ -6,6 +6,9 @@
 int main(int argc, char **argv)
 {
 
+    int pageMiss, pageHit;
+    int* pgMs = &pageMiss;
+    int* pgHt = &pageHit;
     int pages = atoi(argv[1]); //atoi serve per convertire in int
     page_frame *frames = malloc(pages * sizeof(page_frame));
     
@@ -21,7 +24,7 @@ int main(int argc, char **argv)
 
     while(processes != NULL){
 
-        process_file(processes->value, frames, &m, pages, algorithm);
+        process_file(processes->value, frames, &m, pages, algorithm, *pgHt, *pgMs);
         processes = processes->next_ptr;
     }
 
