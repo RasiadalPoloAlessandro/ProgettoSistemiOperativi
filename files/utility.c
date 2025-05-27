@@ -166,7 +166,7 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
         if (frames[i].pageId == pageID)
         {
             frames[i].rBit = 1; // Setta il reference bit
-            printf("Page Hit\n");
+            //printf("Page Hit\n");
             return 0;
         }
     }
@@ -179,12 +179,12 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
             frames[i].pageId = pageID;
             frames[i].rBit = 1;
             frames[i].mBit = 0;
-            printf("Page Fault per spazio libero\n");
+            //printf("Page Fault per spazio libero\n");
             return 1; // Page fault, ma nessuna sostituzione
         }
     }
 
-    printf("Page Fault, non presente in RAM\n");
+    //printf("Page Fault, non presente in RAM\n");
 
     // Scorro finché non trovo la pagina da sostituire, Solo se devo sostuire l'indice del buffer va avanti
     while (1)
@@ -199,7 +199,7 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
             frames[*bufferIndex].rBit = 1;
             frames[*bufferIndex].mBit = 0;
 
-            printf("Sostituisco pagina %i con pagina %i\n", oldPageID, pageID);
+            //printf("Sostituisco pagina %i con pagina %i\n", oldPageID, pageID);
 
             *bufferIndex = (*bufferIndex + 1) % numElements;
             return 1;
@@ -227,7 +227,7 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
     {
         if (frames[i].pageId == pageID)
         {
-            printf("Page Hit\n");
+           // printf("Page Hit\n");
             return 0;
         }
     }
@@ -238,12 +238,12 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
         if (frames[i].pageId == -1)
         {
             frames[i].pageId = pageID;
-            printf("Page Fault per spazio libero\n");
+            //printf("Page Fault per spazio libero\n");
             return 1; // Page fault, ma nessuna sostituzione
         }
     }
 
-    printf("Page Fault, non presente in RAM\n");
+    //printf("Page Fault, non presente in RAM\n");
 
     // Eseguo la politica
     while (1)
@@ -254,7 +254,7 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
 
         frames[*bufferIndex].pageId = pageID;
 
-        printf("Sostituisco pagina %i con pagina %i\n", oldPageID, pageID);
+        //printf("Sostituisco pagina %i con pagina %i\n", oldPageID, pageID);
 
         *bufferIndex = (*bufferIndex + 1) % numElements;
         return 1;
