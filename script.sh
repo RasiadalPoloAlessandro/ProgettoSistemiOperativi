@@ -16,4 +16,8 @@ done
 gcc -pthread ./main.c ./files/utility.c
 chmod +x a.out
 
-./a.out $page_frame ./inputs/
+for i in $(seq 1 2);
+do
+    ./a.out $page_frame ./inputs/ $algorithm
+done
+
