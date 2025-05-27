@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 
     while(processes != NULL){
 
-        process_file(processes->value, frames, &m, pages, algorithm, &pgHt, &pgMs);
+        process_file(processes->value, frames, &m, pages, algorithm, pgHt, pgMs);
         processes = processes->next_ptr;
     }
 
