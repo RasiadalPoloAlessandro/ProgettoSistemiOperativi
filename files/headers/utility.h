@@ -24,3 +24,4 @@ Lista* read_directory(char* directory);
 void pre_insert(Lista **ptr, char* val);
 
 int secondChance(int address, page_frame* frames, int* bufferIndex, int numElements);
+int LRU(int address, page_frame* frames, int* bufferIndex, int numElements);

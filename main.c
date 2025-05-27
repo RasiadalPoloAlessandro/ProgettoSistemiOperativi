@@ -16,8 +16,7 @@ int main(int argc, char **argv)
     //Creo una lista che memorizza i percorsi dei file di input
     Lista* processes = read_directory(argv[2]);
     int m = 0;
-    int algorithm =atoi(read_directory(argv[3]));
-
+    int algorithm = atoi(argv[3]);
     for (int i = 0; i < pages; i++) {
         frames[i].pageId = -1;
         frames[i].rBit = 0;
