@@ -5,6 +5,7 @@
 #define PAGE_DIM 4096
 #define PATH "inputs/"
 int fileCounter = 0;
+int totalPageFault = 0;
 
 
 FILE *open_file(char *file)
@@ -46,21 +47,31 @@ void process_file(char *path, page_frame *frames, int *bufferIndex, int numEleme
 
     char *line = NULL;
     size_t len = 0;
+    int fault = 0;
 
     //printf("Algoritmo Scelto: %s", (algorithm == 1) ? "SecondChance\n\n" : "LRU\n\n");
 
     pthread_mutex_lock(mutex);
-    printf("\n[THREAD %lu] Inizio esecuzione su file: %s\n", pthread_self(), path);    pthread_mutex_unlock(mutex);
+    printf("\n[THREAD %lu] Inizio esecuzione su file: %s\n", pthread_self(), path);    
+    pthread_mutex_unlock(mutex);
+
+
     while (getline(&line, &len, fp) != -1)
     {
         int address = atoi(line);
         if (algorithm == 1)
         {
-            secondChance(address, frames, bufferIndex, numElements);
+            fault = secondChance(address, frames, bufferIndex, numElements);
         }
         else
-            LRU(address, frames, bufferIndex, numElements);
+            fault = LRU(address, frames, bufferIndex, numElements);
     }
+
+    totalPageFault += fault;
+
+    pthread_mutex_lock(mutex);
+    printf("[THREAD %lu] Completato %s - Totale Page Faults: %d\n", pthread_self(), path, totalPageFault);
+    pthread_mutex_unlock(mutex);
 
     free(line);
     fclose(fp);
