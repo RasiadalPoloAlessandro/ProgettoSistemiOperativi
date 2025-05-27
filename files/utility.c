@@ -60,8 +60,19 @@ void process_file(char *path, page_frame *frames, int *bufferIndex, int numEleme
         else
             LRU(address, frames, bufferIndex, numElements, pgHt, pgMs);
     }
-    printf("totale pagehit: %d\n", *pgHt);
-    printf("totale pagefault: %d\n", *pgMs);
+    if(algorithm == 1){
+        printf("== SECOND CHANCE TERMINATO ==\n");
+        printf("Page hit totali : %d_secondChance\n", *pgHt);
+        printf("Page fault totali : %d_secondChance\n", *pgMs);
+        printf("Fault rate complessivo : %d%c_secondChance\n", (*pgMs *100)/(*pgHt+(*pgMs)), '%');
+    }
+    else{
+        printf("== LRU TERMINATO ==\n");
+        printf("Page hit totali : %d_LRU\n", *pgHt);
+        printf("Page fault totali : %d_LRU\n", *pgMs);
+        printf("Fault rate complessivo : %d%c_LRU\n", (*pgMs *100)/(*pgHt+(*pgMs)), '%');
+    }
+
     free(line);
     fclose(fp);
 }
