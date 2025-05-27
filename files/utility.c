@@ -7,7 +7,6 @@
 int fileCounter = 0;
 int totalPageFault = 0;
 
-
 FILE *open_file(char *file)
 {
 
@@ -36,8 +35,8 @@ int read_file(FILE *fp)
 
 void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, pthread_mutex_t *mutex)
 {
-    //printf("Processando file: %s\n\n", path);
-    // printf("File da aprire: %s\n", path);
+    // printf("Processando file: %s\n\n", path);
+    //  printf("File da aprire: %s\n", path);
     FILE *fp = open_file(path);
     if (fp == NULL)
     {
@@ -49,25 +48,24 @@ void process_file(char *path, page_frame *frames, int *bufferIndex, int numEleme
     size_t len = 0;
     int fault = 0;
 
-    //printf("Algoritmo Scelto: %s", (algorithm == 1) ? "SecondChance\n\n" : "LRU\n\n");
+    // printf("Algoritmo Scelto: %s", (algorithm == 1) ? "SecondChance\n\n" : "LRU\n\n");
 
     pthread_mutex_lock(mutex);
-    printf("\n[THREAD %lu] Inizio esecuzione su file: %s\n", pthread_self(), path);    
+    printf("\n[THREAD %lu] Inizio esecuzione su file: %s\n", pthread_self(), path);
     pthread_mutex_unlock(mutex);
-
 
     while (getline(&line, &len, fp) != -1)
     {
         int address = atoi(line);
+        pthread_mutex_lock(mutex);
         if (algorithm == 1)
         {
-            fault = secondChance(address, frames, bufferIndex, numElements);
+            fault += secondChance(address, frames, bufferIndex, numElements);
         }
         else
-            fault = LRU(address, frames, bufferIndex, numElements);
+            fault += LRU(address, frames, bufferIndex, numElements);
+        pthread_mutex_unlock(mutex);
     }
-
-    totalPageFault += fault;
 
     pthread_mutex_lock(mutex);
     printf("[THREAD %lu] Completato %s - Totale Page Faults: %d\n", pthread_self(), path, totalPageFault);
@@ -114,7 +112,7 @@ Lista *read_directory(char *directory)
     {
         while ((dir = readdir(d)) != NULL)
         {
-            if (++fileCounter > 2)
+            if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0)
             {
                 char fullPath[512];
                 snprintf(fullPath, sizeof(fullPath), "%s%s", PATH, dir->d_name);
@@ -139,10 +137,10 @@ Lista *read_directory(char *directory)
 }
 
 /*
-* PRE: address rappresenta la pagina da indirizzare, bufferIndex è puntatore ad un buffer circolare che scorre ciclicamente i frames, 
-* numElements è il numero di pagine
-* POST: Ritorna 1 se c'è stato un fageFault per sistituzione pagina o spazio libero, 0 se c'è stato un pageHit
-*/
+ * PRE: address rappresenta la pagina da indirizzare, bufferIndex è puntatore ad un buffer circolare che scorre ciclicamente i frames,
+ * numElements è il numero di pagine
+ * POST: Ritorna 1 se c'è stato un fageFault per sistituzione pagina o spazio libero, 0 se c'è stato un pageHit
+ */
 int secondChance(int address, page_frame *frames, int *bufferIndex, int numElements)
 {
     int pageID = convert_AddressToPage(address);
@@ -173,7 +171,7 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
 
     printf("Page Fault, non presente in RAM\n");
 
-    //Scorro finché non trovo la pagina da sostituire, Solo se devo sostuire l'indice del buffer va avanti
+    // Scorro finché non trovo la pagina da sostituire, Solo se devo sostuire l'indice del buffer va avanti
     while (1)
     {
         if (frames[*bufferIndex].rBit == 0)
@@ -193,7 +191,7 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
         }
         else
         {
-            //Rimetto il reference bit a 0
+            // Rimetto il reference bit a 0
             frames[*bufferIndex].rBit = 0;
             *bufferIndex = (*bufferIndex + 1) % numElements;
         }
@@ -201,10 +199,10 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
 }
 
 /*
-* PRE: address rappresenta la pagina da indirizzare, bufferIndex è puntatore ad un buffer circolare che scorre ciclicamente i frames, 
-* numElements è il numero di pagine
-* POST: Ritorna 1 se c'è stato un fageFault per sistituzione pagina o spazio libero, 0 se c'è stato un pageHit
-*/
+ * PRE: address rappresenta la pagina da indirizzare, bufferIndex è puntatore ad un buffer circolare che scorre ciclicamente i frames,
+ * numElements è il numero di pagine
+ * POST: Ritorna 1 se c'è stato un fageFault per sistituzione pagina o spazio libero, 0 se c'è stato un pageHit
+ */
 int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
 {
     int pageID = convert_AddressToPage(address);
@@ -232,7 +230,7 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
 
     printf("Page Fault, non presente in RAM\n");
 
-    //Eseguo la politica
+    // Eseguo la politica
     while (1)
     {
 
@@ -248,8 +246,9 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
     }
 }
 
-void* thread_process_file(void* arg) {
-    ThreadArgs* args = (ThreadArgs*) arg;
+void *thread_process_file(void *arg)
+{
+    ThreadArgs *args = (ThreadArgs *)arg;
     process_file(args->path, args->frames, args->bufferIndex, args->numElements, args->algorithm, args->frames_mutex);
     free(arg);
     pthread_exit(NULL);
