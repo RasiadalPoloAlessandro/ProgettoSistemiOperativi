@@ -1,10 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "files/headers/utility.h"
-/*
- * PRE: Ho indirizzi non nulli
- * POST: converto indirizzo di input alla pagina virtuale corrispondente
- */
 
 
 int main(int argc, char **argv)

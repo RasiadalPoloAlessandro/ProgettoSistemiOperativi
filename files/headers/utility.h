@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <string.h>
 
+// Implementa la struttura della memoria fisica (suddivisa in frame di pagina)
 struct page_frame
 {
     int pageId; // Numero di Pagina Virtuale
