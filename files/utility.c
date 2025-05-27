@@ -6,8 +6,6 @@
 #define PATH "inputs/"
 int fileCounter = 0;
 
-
-
 FILE *open_file(char *file)
 {
 
@@ -34,7 +32,7 @@ int read_file(FILE *fp)
     return 0;
 }
 
-void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, int* pgHt, int* pgMs)
+void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, int *pgHt, int *pgMs)
 {
     printf("Processando file: %s\n\n", path);
     // printf("File da aprire: %s\n", path);
@@ -47,9 +45,6 @@ void process_file(char *path, page_frame *frames, int *bufferIndex, int numEleme
 
     char *line = NULL;
     size_t len = 0;
-
-    printf("Algoritmo Scelto: %s", (algorithm == 1) ? "SecondChance\n\n" : "LRU\n\n");
-
     while (getline(&line, &len, fp) != -1)
     {
         int address = atoi(line);
@@ -60,21 +55,27 @@ void process_file(char *path, page_frame *frames, int *bufferIndex, int numEleme
         else
             LRU(address, frames, bufferIndex, numElements, pgHt, pgMs);
     }
-    if(algorithm == 1){
-        printf("== SECOND CHANCE TERMINATO ==\n");
-        printf("Page hit totali : %d_secondChance\n", *pgHt);
-        printf("Page fault totali : %d_secondChance\n", *pgMs);
-        printf("Fault rate complessivo : %d%c_secondChance\n", (*pgMs *100)/(*pgHt+(*pgMs)), '%');
-    }
-    else{
-        printf("== LRU TERMINATO ==\n");
-        printf("Page hit totali : %d_LRU\n", *pgHt);
-        printf("Page fault totali : %d_LRU\n", *pgMs);
-        printf("Fault rate complessivo : %d%c_LRU\n", (*pgMs *100)/(*pgHt+(*pgMs)), '%');
-    }
 
     free(line);
     fclose(fp);
+}
+
+void print_stats(int algoritmo, int *pHit, int *pFault)
+{
+    if (algoritmo == 1)
+    {
+        printf("== SECOND CHANCE TERMINATO ==\n");
+        printf("Page hit totali : %d_secondChance\n", *pHit);
+        printf("Page fault totali : %d_secondChance\n", *pFault);
+        printf("Fault rate complessivo : %d%c_secondChance\n", (*pFault * 100) / (*pHit + (*pFault)), '%');
+    }
+    else
+    {
+        printf("== LRU TERMINATO ==\n");
+        printf("Page hit totali : %d_LRU\n", *pHit);
+        printf("Page fault totali : %d_LRU\n", *pFault);
+        printf("Fault rate complessivo : %d%c_LRU\n", (*pFault * 100) / (*pHit + (*pFault)), '%');
+    }
 }
 
 /*
@@ -139,11 +140,11 @@ Lista *read_directory(char *directory)
 }
 
 /*
-* PRE: address rappresenta la pagina da indirizzare, bufferIndex è puntatore ad un buffer circolare che scorre ciclicamente i frames, 
-* numElements è il numero di pagine
-* POST: Ritorna 1 se c'è stato un fageFault per sistituzione pagina o spazio libero, 0 se c'è stato un pageHit
-*/
-int secondChance(int address, page_frame *frames, int *bufferIndex, int numElements, int* pgHt, int* pgMs)
+ * PRE: address rappresenta la pagina da indirizzare, bufferIndex è puntatore ad un buffer circolare che scorre ciclicamente i frames,
+ * numElements è il numero di pagine
+ * POST: Ritorna 1 se c'è stato un fageFault per sistituzione pagina o spazio libero, 0 se c'è stato un pageHit
+ */
+int secondChance(int address, page_frame *frames, int *bufferIndex, int numElements, int *pgHt, int *pgMs)
 {
     int pageID = convert_AddressToPage(address);
 
@@ -153,7 +154,7 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
         if (frames[i].pageId == pageID)
         {
             frames[i].rBit = 1; // Setta il reference bit
-            (*pgHt) ++;
+            (*pgHt)++;
             printf("Page Hit\n");
             return 0;
         }
@@ -167,15 +168,15 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
             frames[i].pageId = pageID;
             frames[i].rBit = 1;
             frames[i].mBit = 0;
-            (*pgMs) ++;
+            (*pgMs)++;
             printf("Page Fault per spazio libero\n");
             return 1; // Page fault, ma nessuna sostituzione
         }
     }
-    (*pgMs) ++;
+    (*pgMs)++;
     printf("Page Fault, non presente in RAM\n");
 
-    //Scorro finché non trovo la pagina da sostituire, Solo se devo sostuire l'indice del buffer va avanti
+    // Scorro finché non trovo la pagina da sostituire, Solo se devo sostuire l'indice del buffer va avanti
     while (1)
     {
         if (frames[*bufferIndex].rBit == 0)
@@ -195,7 +196,7 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
         }
         else
         {
-            //Rimetto il reference bit a 0
+            // Rimetto il reference bit a 0
             frames[*bufferIndex].rBit = 0;
             *bufferIndex = (*bufferIndex + 1) % numElements;
         }
@@ -203,11 +204,11 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
 }
 
 /*
-* PRE: address rappresenta la pagina da indirizzare, bufferIndex è puntatore ad un buffer circolare che scorre ciclicamente i frames, 
-* numElements è il numero di pagine
-* POST: Ritorna 1 se c'è stato un fageFault per sistituzione pagina o spazio libero, 0 se c'è stato un pageHit
-*/
-int LRU(int address, page_frame *frames, int *bufferIndex, int numElements, int* pgHt, int* pgMs)
+ * PRE: address rappresenta la pagina da indirizzare, bufferIndex è puntatore ad un buffer circolare che scorre ciclicamente i frames,
+ * numElements è il numero di pagine
+ * POST: Ritorna 1 se c'è stato un fageFault per sistituzione pagina o spazio libero, 0 se c'è stato un pageHit
+ */
+int LRU(int address, page_frame *frames, int *bufferIndex, int numElements, int *pgHt, int *pgMs)
 {
     int pageID = convert_AddressToPage(address);
 
@@ -216,7 +217,7 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements, int*
     {
         if (frames[i].pageId == pageID)
         {
-            (*pgHt) ++;
+            (*pgHt)++;
             printf("Page Hit\n");
             return 0;
         }
@@ -233,10 +234,10 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements, int*
             return 1; // Page fault, ma nessuna sostituzione
         }
     }
-    (*pgMs) ++;
+    (*pgMs)++;
     printf("Page Fault, non presente in RAM\n");
 
-    //Eseguo la politica
+    // Eseguo la politica
     while (1)
     {
 

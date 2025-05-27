@@ -26,3 +26,4 @@ void pre_insert(Lista **ptr, char* val);
 
 int secondChance(int address, page_frame* frames, int* bufferIndex, int numElements, int* pgHt, int* pgMs);
 int LRU(int address, page_frame* frames, int* bufferIndex, int numElements, int* pgHt, int* pgMs);
+void print_stats(int algoritmo, int *pHit, int *pFault);
