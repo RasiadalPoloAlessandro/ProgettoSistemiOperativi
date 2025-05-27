@@ -28,6 +28,9 @@ int main(int argc, char **argv)
         processes = processes->next_ptr;
     }
 
+    printf("totale pagehit: %d\n", *pgHt);
+    printf("totale pagefault: %d\n", *pgMs);
+
 
     return 0;
 }
