@@ -16,10 +16,7 @@ int main(int argc, char **argv)
     // Creo una lista che memorizza i percorsi dei file di input
     Lista *processes = read_directory(argv[2], &fileCounter);
     int m = 0;
-    for (int round = 0; round < 2; round++)
-    {
-        int algorithm = round; // 0: LRU, 1: SecondChance
-
+        int algorithm = atoi(argv[3]); // 0: LRU, 1: SecondChance
         // Reset RAM
         for (int i = 0; i < pages; i++)
         {
@@ -59,7 +56,6 @@ int main(int argc, char **argv)
 
         printf("\n--- RISULTATI PER %s ---\n", (algorithm == 0) ? "LRU" : "Second Chance");
         print_stats(algorithm, &pageHit, &pageMiss);
-    }
 
     return 0;
 }
