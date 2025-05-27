@@ -11,7 +11,7 @@ struct page_frame
     int mBit;
 };
 typedef struct page_frame page_frame;
-void process_file(char* path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, pthread_mutex_t* mutex);
+void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, int *pgHt, int *pgMs, pthread_mutex_t *mutex);
 //int read_file(FILE *fp);
 int convert_AddressToPage(int address);
 FILE* open_file(char* file);
@@ -22,7 +22,7 @@ struct nodoStringa
     struct nodoStringa *next_ptr;
 };
 typedef struct nodoStringa Lista;
-Lista* read_directory(char* directory);
+Lista* read_directory(char* directory, int* fileCounter);
 void pre_insert(Lista **ptr, char* val);
 
 int secondChance(int address, page_frame* frames, int* bufferIndex, int numElements);
@@ -37,6 +37,9 @@ typedef struct {
     int* bufferIndex;
     int numElements;
     int algorithm;
+    int* pFault;
+    int* pHit;
     pthread_mutex_t *frames_mutex;
 } ThreadArgs;
 void* thread_process_file(void* arg);
+void print_stats(int algoritmo, int *pHit, int *pFault);

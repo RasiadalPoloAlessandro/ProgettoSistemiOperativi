@@ -5,7 +5,6 @@
 #define PAGE_DIM 4096
 #define PATH "inputs/"
 int fileCounter = 0;
-int totalPageFault = 0;
 
 FILE *open_file(char *file)
 {
@@ -33,7 +32,7 @@ int read_file(FILE *fp)
     return 0;
 }
 
-void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, pthread_mutex_t *mutex)
+void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, int *pgHt, int *pgMs, pthread_mutex_t *mutex)
 {
     // printf("Processando file: %s\n\n", path);
     //  printf("File da aprire: %s\n", path);
@@ -50,29 +49,44 @@ void process_file(char *path, page_frame *frames, int *bufferIndex, int numEleme
 
     // printf("Algoritmo Scelto: %s", (algorithm == 1) ? "SecondChance\n\n" : "LRU\n\n");
 
-    pthread_mutex_lock(mutex);
-    printf("\n[THREAD %lu] Inizio esecuzione su file: %s\n", pthread_self(), path);
-    pthread_mutex_unlock(mutex);
-
     while (getline(&line, &len, fp) != -1)
     {
         int address = atoi(line);
         pthread_mutex_lock(mutex);
         if (algorithm == 1)
         {
-            fault += secondChance(address, frames, bufferIndex, numElements);
+            fault = secondChance(address, frames, bufferIndex, numElements);
         }
         else
-            fault += LRU(address, frames, bufferIndex, numElements);
+            fault = LRU(address, frames, bufferIndex, numElements);
+
+        if (fault == 0)
+            (*pgHt)++;
+        else
+            (*pgMs)++;
         pthread_mutex_unlock(mutex);
     }
 
-    pthread_mutex_lock(mutex);
-    printf("[THREAD %lu] Completato %s - Totale Page Faults: %d\n", pthread_self(), path, totalPageFault);
-    pthread_mutex_unlock(mutex);
-
     free(line);
     fclose(fp);
+}
+
+void print_stats(int algoritmo, int *pHit, int *pFault)
+{
+    if (algoritmo == 1)
+    {
+        printf("== SECOND CHANCE TERMINATO ==\n");
+        printf("Page hit totali : %d_secondChance\n", *pHit);
+        printf("Page fault totali : %d_secondChance\n", *pFault);
+        printf("Fault rate complessivo : %d%c_secondChance\n", (*pFault * 100) / (*pHit + (*pFault)), '%');
+    }
+    else
+    {
+        printf("== LRU TERMINATO ==\n");
+        printf("Page hit totali : %d_LRU\n", *pHit);
+        printf("Page fault totali : %d_LRU\n", *pFault);
+        printf("Fault rate complessivo : %d%c_LRU\n", (*pFault * 100) / (*pHit + (*pFault)), '%');
+    }
 }
 
 /*
@@ -101,7 +115,7 @@ void pre_insert(Lista **ptr, char *val)
     (*ptr)->next_ptr = tmpPtr;
 }
 
-Lista *read_directory(char *directory)
+Lista *read_directory(char *directory, int *fileCounter)
 {
     DIR *d;
     Lista *percorsi = NULL;
@@ -117,6 +131,7 @@ Lista *read_directory(char *directory)
                 char fullPath[512];
                 snprintf(fullPath, sizeof(fullPath), "%s%s", PATH, dir->d_name);
                 pre_insert(&percorsi, fullPath);
+                (*fileCounter)++;
             }
         }
         closedir(d);
@@ -249,7 +264,7 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
 void *thread_process_file(void *arg)
 {
     ThreadArgs *args = (ThreadArgs *)arg;
-    process_file(args->path, args->frames, args->bufferIndex, args->numElements, args->algorithm, args->frames_mutex);
+    process_file(args->path, args->frames, args->bufferIndex, args->numElements, args->algorithm, args->pHit, args->pFault, args->frames_mutex);
     free(arg);
     pthread_exit(NULL);
 }

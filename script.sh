@@ -12,16 +12,8 @@ while [ $page_frame -le 0 ]; do
     read page_frame
 done
 
-echo "Inserire algoritmo di sostituzione: Second Change (1) - LRU (0)"
-read algorithm
-
-while [ "$algorithm" -ne 0 ] && [ "$algorithm" -ne 1 ]; do
-    echo "Algoritmo scelto invalido"
-    read algorithm
-done
-
 
 gcc -pthread ./main.c ./files/utility.c
 chmod +x a.out
 
-./a.out $page_frame ./inputs/ $algorithm
+./a.out $page_frame ./inputs/
