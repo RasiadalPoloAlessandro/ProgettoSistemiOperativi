@@ -60,8 +60,7 @@ void process_file(char *path, page_frame *frames, int *bufferIndex, int numEleme
         else
             LRU(address, frames, bufferIndex, numElements, pgHt, pgMs);
     }
-    printf("totale pagehit: %d\n", *pgHt);
-    printf("totale pagefault: %d\n", *pgMs);
+    
     free(line);
     fclose(fp);
 }
