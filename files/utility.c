@@ -60,7 +60,8 @@ void process_file(char *path, page_frame *frames, int *bufferIndex, int numEleme
         else
             LRU(address, frames, bufferIndex, numElements, pgHt, pgMs);
     }
-
+    printf("totale pagehit: %d", *pgHt);
+    printf("totale pagefault: %d", *pgMs);
     free(line);
     fclose(fp);
 }
@@ -141,7 +142,7 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
         if (frames[i].pageId == pageID)
         {
             frames[i].rBit = 1; // Setta il reference bit
-            *pgHt ++;
+            (*pgHt) ++;
             printf("Page Hit\n");
             return 0;
         }
@@ -155,12 +156,12 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
             frames[i].pageId = pageID;
             frames[i].rBit = 1;
             frames[i].mBit = 0;
-            *pgMs ++;
+            (*pgMs) ++;
             printf("Page Fault per spazio libero\n");
             return 1; // Page fault, ma nessuna sostituzione
         }
     }
-    *pgMs ++;
+    (*pgMs) ++;
     printf("Page Fault, non presente in RAM\n");
 
     //Scorro finché non trovo la pagina da sostituire, Solo se devo sostuire l'indice del buffer va avanti
@@ -204,7 +205,7 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements, int*
     {
         if (frames[i].pageId == pageID)
         {
-            *pgHt ++;
+            (*pgHt) ++;
             printf("Page Hit\n");
             return 0;
         }
@@ -216,12 +217,12 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements, int*
         if (frames[i].pageId == -1)
         {
             frames[i].pageId = pageID;
-            *pgMs ++;
+            (*pgMs)++;
             printf("Page Fault per spazio libero\n");
             return 1; // Page fault, ma nessuna sostituzione
         }
     }
-    *pgMs ++;
+    (*pgMs) ++;
     printf("Page Fault, non presente in RAM\n");
 
     //Eseguo la politica

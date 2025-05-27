@@ -6,7 +6,7 @@
 int main(int argc, char **argv)
 {
 
-    int pageMiss, pageHit;
+    int pageMiss = 0, pageHit = 0;
     int* pgMs = &pageMiss;
     int* pgHt = &pageHit;
     int pages = atoi(argv[1]); //atoi serve per convertire in int
@@ -24,9 +24,10 @@ int main(int argc, char **argv)
 
     while(processes != NULL){
 
-        process_file(processes->value, frames, &m, pages, algorithm, *pgHt, *pgMs);
+        process_file(processes->value, frames, &m, pages, algorithm, &pgHt, &pgMs);
         processes = processes->next_ptr;
     }
+
 
     return 0;
 }
