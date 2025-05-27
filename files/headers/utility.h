@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <string.h>
+#include <pthread.h>
 
 // Implementa la struttura della memoria fisica (suddivisa in frame di pagina)
 struct page_frame
@@ -10,7 +11,7 @@ struct page_frame
     int mBit;
 };
 typedef struct page_frame page_frame;
-void process_file(char* path, page_frame *frames, int *bufferIndex, int numElements, int algorithm);
+void process_file(char* path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, pthread_mutex_t* mutex);
 //int read_file(FILE *fp);
 int convert_AddressToPage(int address);
 FILE* open_file(char* file);
@@ -26,3 +27,16 @@ void pre_insert(Lista **ptr, char* val);
 
 int secondChance(int address, page_frame* frames, int* bufferIndex, int numElements);
 int LRU(int address, page_frame* frames, int* bufferIndex, int numElements);
+
+
+
+//Parte multithread
+typedef struct {
+    char* path;
+    page_frame* frames;
+    int* bufferIndex;
+    int numElements;
+    int algorithm;
+    pthread_mutex_t *frames_mutex;
+} ThreadArgs;
+void* thread_process_file(void* arg);

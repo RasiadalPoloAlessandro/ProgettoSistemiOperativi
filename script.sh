@@ -21,7 +21,7 @@ while [ "$algorithm" -ne 0 ] && [ "$algorithm" -ne 1 ]; do
 done
 
 
-gcc ./main.c ./files/utility.c
+gcc -pthread ./main.c ./files/utility.c
 chmod +x a.out
 
 ./a.out $page_frame ./inputs/ $algorithm

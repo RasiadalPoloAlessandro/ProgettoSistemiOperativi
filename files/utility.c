@@ -33,9 +33,9 @@ int read_file(FILE *fp)
     return 0;
 }
 
-void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm)
+void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, pthread_mutex_t *mutex)
 {
-    printf("Processando file: %s\n\n", path);
+    //printf("Processando file: %s\n\n", path);
     // printf("File da aprire: %s\n", path);
     FILE *fp = open_file(path);
     if (fp == NULL)
@@ -47,8 +47,10 @@ void process_file(char *path, page_frame *frames, int *bufferIndex, int numEleme
     char *line = NULL;
     size_t len = 0;
 
-    printf("Algoritmo Scelto: %s", (algorithm == 1) ? "SecondChance\n\n" : "LRU\n\n");
+    //printf("Algoritmo Scelto: %s", (algorithm == 1) ? "SecondChance\n\n" : "LRU\n\n");
 
+    pthread_mutex_lock(mutex);
+    printf("\n[THREAD %lu] Inizio esecuzione su file: %s\n", pthread_self(), path);    pthread_mutex_unlock(mutex);
     while (getline(&line, &len, fp) != -1)
     {
         int address = atoi(line);
@@ -233,4 +235,11 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
         *bufferIndex = (*bufferIndex + 1) % numElements;
         return 1;
     }
+}
+
+void* thread_process_file(void* arg) {
+    ThreadArgs* args = (ThreadArgs*) arg;
+    process_file(args->path, args->frames, args->bufferIndex, args->numElements, args->algorithm, args->frames_mutex);
+    free(arg);
+    pthread_exit(NULL);
 }
