@@ -49,7 +49,7 @@
         while (getline(&line, &len, fp) != -1)
         {
             int address = atoi(line);
-            if(algorithm){
+            if(algorithm == 1){
                 secondChance(address, frames, bufferIndex, numElements);
             }
             else
