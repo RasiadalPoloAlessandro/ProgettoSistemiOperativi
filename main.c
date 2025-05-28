@@ -23,6 +23,7 @@ int main(int argc, char **argv)
             frames[i].pageId = -1;
             frames[i].rBit = 0;
             frames[i].mBit = 0;
+            frames[i].lastAccessed = 0;
         }
         pthread_t *tId = malloc(fileCounter * sizeof(pthread_t));
         int bufferIndex = 0;
