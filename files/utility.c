@@ -228,12 +228,12 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
     {
         if (frames[i].pageId == pageID)
         {
-            frames[i].lastAccessed = ++global_time;  // ✅ Aggiorna timestamp
+            frames[i].lastAccessed = ++global_time;
             return 0;
         }
     }
     
-    // Cerca spazio libero
+    // Cerco se c'è spazio in RAM
     for (int i = 0; i < numElements; i++)
     {
         if (frames[i].pageId == -1)
@@ -244,7 +244,7 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
         }
     }
     
-    // Trova la pagina LEAST RECENTLY USED
+    // TTrovo la pagina usata da meno tempo
     int lru_index = 0;
     int min_time = frames[0].lastAccessed;
     
@@ -257,7 +257,7 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
         }
     }
     
-    // Sostituisce la pagina LRU
+    // SSostituisco la pagina
     frames[lru_index].pageId = pageID;
     frames[lru_index].lastAccessed = ++global_time;
     
