@@ -5,6 +5,7 @@
 #define PAGE_DIM 4096
 #define PATH "inputs/"
 int fileCounter = 0;
+static int global_time = 0;
 
 FILE *open_file(char *file)
 {
@@ -221,44 +222,46 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
 int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
 {
     int pageID = convert_AddressToPage(address);
-
+    
     // Controllo se c'è la pagina in RAM (pageHit)
     for (int i = 0; i < numElements; i++)
     {
         if (frames[i].pageId == pageID)
         {
-           // printf("Page Hit\n");
+            frames[i].lastAccessed = ++global_time;  // ✅ Aggiorna timestamp
             return 0;
         }
     }
-
-    // Dato che la RAM parte vuota potrei avere ancora spazi liberi
+    
+    // Cerca spazio libero
     for (int i = 0; i < numElements; i++)
     {
         if (frames[i].pageId == -1)
         {
             frames[i].pageId = pageID;
-            //printf("Page Fault per spazio libero\n");
-            return 1; // Page fault, ma nessuna sostituzione
+            frames[i].lastAccessed = ++global_time;
+            return 1;
         }
     }
-
-    //printf("Page Fault, non presente in RAM\n");
-
-    // Eseguo la politica
-    while (1)
+    
+    // Trova la pagina LEAST RECENTLY USED
+    int lru_index = 0;
+    int min_time = frames[0].lastAccessed;
+    
+    for (int i = 1; i < numElements; i++)
     {
-
-        // Pagina trovata per la sostituzione
-        int oldPageID = frames[*bufferIndex].pageId;
-
-        frames[*bufferIndex].pageId = pageID;
-
-        //printf("Sostituisco pagina %i con pagina %i\n", oldPageID, pageID);
-
-        *bufferIndex = (*bufferIndex + 1) % numElements;
-        return 1;
+        if (frames[i].lastAccessed < min_time)
+        {
+            min_time = frames[i].lastAccessed;
+            lru_index = i;
+        }
     }
+    
+    // Sostituisce la pagina LRU
+    frames[lru_index].pageId = pageID;
+    frames[lru_index].lastAccessed = ++global_time;
+    
+    return 1;
 }
 
 void *thread_process_file(void *arg)

@@ -9,6 +9,7 @@ struct page_frame
     int pageId; // Numero di Pagina Virtuale
     int rBit;
     int mBit;
+    int lastAccessed;
 };
 typedef struct page_frame page_frame;
 void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, int *pgHt, int *pgMs, pthread_mutex_t *mutex);
