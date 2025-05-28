@@ -1,0 +1,13 @@
+Alessandro Rasia dal Polo : 2145590
+Guerra Andrea : 2137978
+
+Per il codice C abbiamo deciso di adottare le seguenti scelte progettuali:
+-  La RAM vuota viene indicata con page_id = -1
+-  Per contare tutti i page fault e page hit tra tutti i thread abbiamo creato una variabile globale nel main che abbiamo gestito tramite semafori nei vari thread e modificate tramite puntatori
+-  process_file : abbiamo voluto scegliere una funzione unica che poi richiamasse rispettivamente i due algoritmi di rimpiazzo in base ad una variabile binaria "algorithm" e gestisce anche l'incremento di page hit e page fault
+-  Gli algoritmi ritornano rispettivamente se c'è stato o meno un page fault
+-  Per la questione dell'encapsulation abbiamo voluto richiamare nel main solo la libreria dove sono presenti le funzioni per tenere nascosta l'implementazione
+
+Per lo script bash invece:
+-  Facciamo un controllo per vedere se il file esiste tramite il comando -f altrimenti ritorniamo un errore
+-  Effettuiamo controlli per vedere se il numero di pagine inserite è maggiore di 0
