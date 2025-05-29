@@ -5,6 +5,7 @@
 #define PAGE_DIM 4096
 #define PATH "inputs/"
 int fileCounter = 0;
+//Uso una variabile intera per rappresentare il tempo di accesso, uso static per utilizzare la variabile SOLO in questo file (una specie di private)
 static int global_time = 0;
 
 FILE *open_file(char *file)
@@ -102,7 +103,6 @@ int convert_AddressToPage(int address)
 /*
  * Leggo la cartella contentente i file di input
  */
-
 void pre_insert(Lista **ptr, char *val)
 {
     Lista *tmpPtr = *ptr;
@@ -112,10 +112,12 @@ void pre_insert(Lista **ptr, char *val)
         perror("Malloc fallita");
         exit(1);
     }
-    (*ptr)->value = strdup(val); // copia la stringa
+    (*ptr)->value = strdup(val); //strdup serve per copiare la stringa
     (*ptr)->next_ptr = tmpPtr;
 }
-
+/*
+* Leggo il contenuto di una cartella
+*/
 Lista *read_directory(char *directory, int *fileCounter)
 {
     DIR *d;
@@ -127,6 +129,7 @@ Lista *read_directory(char *directory, int *fileCounter)
     {
         while ((dir = readdir(d)) != NULL)
         {
+            //non tengo conto di . e .. per il conteggio
             if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0)
             {
                 char fullPath[512];
@@ -216,7 +219,7 @@ int secondChance(int address, page_frame *frames, int *bufferIndex, int numEleme
 
 /*
  * PRE: address rappresenta la pagina da indirizzare, bufferIndex è puntatore ad un buffer circolare che scorre ciclicamente i frames,
- * numElements è il numero di pagine
+ * numElements è il numero di pagine. Per applicare l'algoritmo utilizzo una variabile globale intera che rappresenta il tempo di accesso
  * POST: Ritorna 1 se c'è stato un fageFault per sistituzione pagina o spazio libero, 0 se c'è stato un pageHit
  */
 int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
@@ -244,7 +247,7 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
         }
     }
     
-    // TTrovo la pagina usata da meno tempo
+    // Trovo la pagina usata da meno tempo
     int lru_index = 0;
     int min_time = frames[0].lastAccessed;
     
@@ -257,13 +260,16 @@ int LRU(int address, page_frame *frames, int *bufferIndex, int numElements)
         }
     }
     
-    // SSostituisco la pagina
+    // Sostituisco la pagina
     frames[lru_index].pageId = pageID;
     frames[lru_index].lastAccessed = ++global_time;
     
     return 1;
 }
 
+/*
+* I prendono come parametro un puntatore a funzione, ne creo una che richiami la funzione di mio interesse passando tutti i parametri necessari
+*/
 void *thread_process_file(void *arg)
 {
     ThreadArgs *args = (ThreadArgs *)arg;

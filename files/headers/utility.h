@@ -43,4 +43,9 @@ typedef struct {
     pthread_mutex_t *frames_mutex;
 } ThreadArgs;
 void* thread_process_file(void* arg);
+
+/* 
+*PRE: tutti valori sono gestiti correttamente in modalità mutualmente esclusiva tra tutti i thread evitando race condition
+* POST: Restituisce le statistiche dei pageFault e PageHit
+*/
 void print_stats(int algoritmo, int *pHit, int *pFault);

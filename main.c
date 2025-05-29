@@ -30,10 +30,10 @@ int main(int argc, char **argv)
         pageMiss = 0;
         pageHit = 0;
 
-        Lista *current = processes;
+        Lista *current = processes; //Se mi dovesse servire ancora processes uso una copia
         int i = 0;
 
-        // Avvia nuovi thread per ogni file
+        //Per ogni processo creo un thread
         while (current != NULL)
         {
             ThreadArgs *args = malloc(sizeof(ThreadArgs));
@@ -54,6 +54,11 @@ int main(int argc, char **argv)
         {
             pthread_join(tId[j], NULL);
         }
+
+        //Libero la memoria delle strutture utilizzate
+        free(current);
+        free(processes);
+        free(frames);
 
         printf("\n--- RISULTATI PER %s ---\n", (algorithm == 0) ? "LRU" : "Second Chance");
         print_stats(algorithm, &pageHit, &pageMiss);

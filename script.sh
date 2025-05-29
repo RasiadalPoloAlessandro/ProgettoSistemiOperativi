@@ -16,6 +16,7 @@ done
 gcc -pthread ./main.c ./files/utility.c
 chmod +x a.out
 
+#Eseguo l'algoritmo 2 volte con il rispettivo algoritmo
 for i in $(seq 0 1);
 do
     ./a.out $page_frame ./inputs/ $i
