@@ -5,6 +5,8 @@ if [ -f "./main.c" ] && [ -f "./files/utility.c" ]; then
     echo "file exists"
 fi
 
+touch output.txt
+
 echo "Inserire numero di page_frame:"
 read page_frame
 while [ $page_frame -le 0 ]; do
@@ -22,3 +24,6 @@ do
     ./a.out $page_frame ./inputs/ $i
 done
 
+more output.txt
+
+rm output.txt

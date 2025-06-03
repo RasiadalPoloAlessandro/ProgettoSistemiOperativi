@@ -73,22 +73,27 @@ void process_file(char *path, page_frame *frames, int *bufferIndex, int numEleme
     fclose(fp);
 }
 
-void print_stats(int algoritmo, int *pHit, int *pFault)
+int print_stats(int algoritmo, int *pHit, int *pFault)
 {
+    FILE *fp = fopen("output.txt", "a");
+
+
     if (algoritmo == 1)
     {
-        printf("== SECOND CHANCE TERMINATO ==\n");
-        printf("Page hit totali : %d_secondChance\n", *pHit);
-        printf("Page fault totali : %d_secondChance\n", *pFault);
-        printf("Fault rate complessivo : %d%c_secondChance\n", (*pFault * 100) / (*pHit + (*pFault)), '%');
+        fprintf(fp,"== SECOND CHANCE TERMINATO ==\n");
+        fprintf(fp, "Page hit totali : %d_secondChance\n", *pHit);
+        fprintf(fp, "Page fault totali : %d_secondChance\n", *pFault);
+        fprintf(fp, "Fault rate complessivo : %d%c_secondChance\n", (*pFault * 100) / (*pHit + (*pFault)), '%');
     }
     else
     {
-        printf("== LRU TERMINATO ==\n");
-        printf("Page hit totali : %d_LRU\n", *pHit);
-        printf("Page fault totali : %d_LRU\n", *pFault);
-        printf("Fault rate complessivo : %d%c_LRU\n", (*pFault * 100) / (*pHit + (*pFault)), '%');
+        fprintf(fp, "== LRU TERMINATO ==\n");
+        fprintf(fp, "Page hit totali : %d_LRU\n", *pHit);
+        fprintf(fp, "Page fault totali : %d_LRU\n", *pFault);
+        fprintf(fp, "Fault rate complessivo : %d%c_LRU\n", (*pFault * 100) / (*pHit + (*pFault)), '%');
     }
+
+    fclose(fp);
 }
 
 /*
@@ -276,4 +281,11 @@ void *thread_process_file(void *arg)
     process_file(args->path, args->frames, args->bufferIndex, args->numElements, args->algorithm, args->pHit, args->pFault, args->frames_mutex);
     free(arg);
     pthread_exit(NULL);
+}
+
+int write_file(char* path){
+
+    FILE *fp = open_file(path);
+
+    
 }

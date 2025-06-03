@@ -60,7 +60,6 @@ int main(int argc, char **argv)
         free(processes);
         free(frames);
 
-        printf("\n--- RISULTATI PER %s ---\n", (algorithm == 0) ? "LRU" : "Second Chance");
         print_stats(algorithm, &pageHit, &pageMiss);
 
     return 0;
