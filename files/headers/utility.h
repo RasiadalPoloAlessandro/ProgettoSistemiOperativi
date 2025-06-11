@@ -12,6 +12,10 @@ struct page_frame
     int lastAccessed;
 };
 typedef struct page_frame page_frame;
+/*
+* Verifica la validità della stringa, ritorna 0 se può essere convertita in numero, -1 se non può
+*/
+int check_raw(char** raw);
 void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, int *pgHt, int *pgMs, pthread_mutex_t *mutex);
 //int read_file(FILE *fp);
 int convert_AddressToPage(int address);

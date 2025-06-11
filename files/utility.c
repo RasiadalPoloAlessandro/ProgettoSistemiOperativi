@@ -34,6 +34,23 @@ int read_file(FILE *fp)
     return 0;
 }
 
+
+int check_raw(char** raw) {
+    char *end;
+    strtod(*raw, &end);
+
+    //Salto spazi bianchi o altre condizioni non valide
+    while (*end == ' ' || *end == '\t' || *end == '\n')
+        end++;
+
+    if (*end == '\0') {
+        return 0;
+    } else {
+        fprintf(stderr, "Warning: riga saltata perché non valida: %s\n", *raw);
+        return -1;
+    }
+}
+
 void process_file(char *path, page_frame *frames, int *bufferIndex, int numElements, int algorithm, int *pgHt, int *pgMs, pthread_mutex_t *mutex)
 {
     // printf("Processando file: %s\n\n", path);
@@ -53,6 +70,9 @@ void process_file(char *path, page_frame *frames, int *bufferIndex, int numEleme
 
     while (getline(&line, &len, fp) != -1)
     {
+        if (check_raw(&line) == -1)
+            continue;
+
         int address = atoi(line);
         pthread_mutex_lock(mutex);
         if (algorithm == 1)
