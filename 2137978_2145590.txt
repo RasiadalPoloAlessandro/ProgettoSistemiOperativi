@@ -2,12 +2,16 @@ Alessandro Rasia dal Polo : 2145590
 Guerra Andrea : 2137978
 
 Per il codice C abbiamo deciso di adottare le seguenti scelte progettuali:
--  La RAM vuota viene indicata con page_id = -1
--  Per contare tutti i page fault e page hit tra tutti i thread abbiamo creato una variabile globale nel main che abbiamo gestito tramite semafori nei vari thread e modificate tramite puntatori
--  process_file : abbiamo voluto scegliere una funzione unica che poi richiamasse rispettivamente i due algoritmi di rimpiazzo in base ad una variabile binaria "algorithm" e gestisce anche l'incremento di page hit e page fault
--  Gli algoritmi ritornano rispettivamente se c'è stato o meno un page fault
--  Per la questione dell'encapsulation abbiamo voluto richiamare nel main solo la libreria dove sono presenti le funzioni per tenere nascosta l'implementazione
+Per facilitare il debugging, migliorare l'ordine e la pulizia del codice abbiamo suddiviso il problema principale in più sottoproblemi utilizzando funzioni separate.
+Sempre per migliorare la pulizia del codice abbiamo utilizzato file .h per esplicitare solo la firma delle funzioni con relative descrizioni del loro funziomento e file .c per la loro effettiva implementazione.
+Il file main.c si occupa esclusivamente di recuperare gli argomenti passati da terminale, inizializzare le variabili globali, inizializzare le strutture (frames e liste) e gestire i thread.
+All'interno di utility.c invece si trovano tutte le funzioni necessarie per l'applicazione degli algoritmi e per la gestione dei file
+
+Per risolvere alcune problematiche abbiamo implementato le seguenti funzionalità:
+-  Indichiamo la RAM vuota con page_id = -1 per sapere se ci sono frames occupabili
+-  Le funzioni degli algoritmi ritornano se c'è stato o meno un page fault per aumentare un contatore
+-  Se una riga letta dal file di input non è valida viene saltata dal programma
 
 Per lo script bash invece:
--  Facciamo un controllo per vedere se il file esiste tramite il comando -f altrimenti ritorniamo un errore
--  Effettuiamo controlli per vedere se il numero di pagine inserite è maggiore di 0
+-  Controlliamo l'esistenza dei file essenziali per l'esecuzione del programma (main.c e utility.c)
+- "Catturiamo" l'output del programma con le statistiche scritte dal file .c su un file creato all'avvio dell'esecuzione ed eliminato alla sua conclusione
